@@ -1,0 +1,55 @@
+menu = '''
+    BEM VINDO AO BANCO
+[d] --> Depositar
+[s] --> Sacar
+[e] --> Extrato
+[f] --> Sair
+Digite a opção desejada:
+'''
+limite = 500.0
+numero_saques = 0
+LIMITE_SAQUE = 3
+deposito = 0.0
+sacado = 0.0
+saldo = 0.0
+
+while True:
+
+    print(menu)
+    
+    opcao = input()
+    
+    if opcao == 'd':
+        print('Depósito')
+        deposito = float(input('Qual o valor que você deseja depositar? '))
+        if deposito < 0:
+            print('Não é possível realizar depósito negativo!')
+        else:
+            saldo = saldo + deposito
+            print('Depósito realizado')
+            print(f'Seu saldo é de R$ {saldo}')
+    
+    elif opcao == 's':
+        print('Sacar')
+        if numero_saques < LIMITE_SAQUE:
+            sacado = float(input('Qual o valor que você deseja sacar? '))
+            if sacado > saldo:
+                print('Saldo insuficiente para o saque proposto!')
+            elif sacado > 500:
+                print('Limite máximo por saque = R$500,00')    
+            else:
+                saldo = saldo - sacado
+                numero_saques += 1
+                print(f"Você sacou R${sacado:.2f}")
+        else:
+            print('Limite de saques atingido!')
+    
+    elif opcao == 'e':
+        print('Extrato')
+        print("Seu saldo é de R$ {:.2f}".format(saldo))
+    
+    elif opcao == 'f':
+        break
+    
+    else:
+        print('Opção inválida!')
