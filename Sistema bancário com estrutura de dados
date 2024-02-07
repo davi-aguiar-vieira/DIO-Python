@@ -1,1 +1,164 @@
+import ast  # Módulo utilizado para converter a string de dicionário de volta para um dicionário
+
+import ast
+
+menu_conta1 = '''
+
+    Bem vindo a sua conta!
+        [d] depositar
+        [s] sacar
+        [e] extrato
+        [sair] sair
+
+'''
+
+def menu_conta(cpf_conta):
+    continuar = True
+    while continuar:
+        with open('dados_usuarios2.txt', 'r+') as arquivo:
+            linhas = arquivo.readlines()
+            arquivo.seek(0)  # Retorna ao início do arquivo
+
+            for i, linha in enumerate(linhas):
+                linha = linha.strip()  # Remove o caractere de nova linha
+                dados_usuario = ast.literal_eval(linha)
+                cpf_armazenado = dados_usuario.get("CPF")
+                
+                if cpf_armazenado == cpf_conta:
+
+                    print(menu_conta1)
+
+                    opcao_conta = input('Digite a opção desejada: ')
+
+                    if opcao_conta == 'd':
+
+                        valor_deposito = float(input('Digite o valor que deseja depositar: ')) 
+                        saldo = dados_usuario["Saldo"]
+                        novo_saldo = saldo + valor_deposito
+                        dados_usuario.update({"Saldo": novo_saldo})
+                        print(f'Valor depositado R${valor_deposito}!')
+                        linhas[i] = str(dados_usuario) + '\n'
+
+                    elif opcao_conta == 's':
+
+                        valor_saque = float(input('Digite o valor que deseja sacar: '))
+                        saldo = dados_usuario["Saldo"]
+                        if valor_saque <= saldo:
+                            novo_saldo1 = saldo - valor_saque
+                            dados_usuario.update({"Saldo": novo_saldo1})
+                            print(f'Valor sacado R${valor_saque}!')
+                            linhas[i] = str(dados_usuario) + '\n'
+                        else:
+                            print('Valor de saque maior que o seu saldo!')
+
+                    elif opcao_conta == 'e':
+
+                        print(f'O saldo da sua conta é de: R${dados_usuario["Saldo"]}')
+
+                    elif opcao_conta == 'sair':
+                        
+                        print('Sessão finalizada')
+                        continuar = False
+                        break
+                    else:
+                        print('Opção inválida!')
+
+            # Volta ao início do arquivo e reescreve todas as linhas atualizadas
+            arquivo.seek(0)
+            arquivo.writelines(linhas)
+            arquivo.truncate()  # Remove qualquer conteúdo restante, se necessário
+    
+
+                
+
+def acessar_conta():
+    cpf_login = input('Digite o seu CPF: ')
+
+    with open('dados_usuarios2.txt', 'r') as arquivo:
+        linhas = arquivo.readlines()
+
+        for linha in linhas:
+            linha = linha.strip()  # Remove o caractere de nova linha
+            dados_usuario = ast.literal_eval(linha)
+            cpf_armazenado = dados_usuario.get("CPF")
+            senha_armazenada = dados_usuario.get("Senha")
+
+            if cpf_armazenado == cpf_login:
+                senha_login = input('Digite a sua senha: ')
+                if senha_login == senha_armazenada:
+                    print(f'Bem-vindo, {dados_usuario.get("Nome")}!')
+                    print(f'Agência: {dados_usuario.get("NumeroAgencia")}')
+                    print(f'Conta: {dados_usuario.get("NumeroConta")}')
+                    menu_conta(cpf_login)
+                    return
+                else:
+                    print('Senha incorreta. Acesso negado.')
+                    return
+
+    print('CPF não encontrado. Acesso negado.')
+
+
+def cpf_repetido(cpf_input):
+
+    with open('dados_usuarios2.txt', 'r') as arquivo:
+        linhas = arquivo.readlines()
+
+        for linha in linhas:
+            dados_usuario = ast.literal_eval(linha)  # Converte a string de dicionário para um dicionário
+            cpf_armazenado = dados_usuario.get("CPF")
+
+            if cpf_armazenado == cpf_input:
+                return True
+        return False
+
+def criar_conta():
+    print('')
+
+    with open('dados_usuarios2.txt', 'a+') as arquivo:
+        nome = input('Digite seu nome: ')
+        cpf = input('Digite o seu CPF: ')
+        senha = input('Digite sua senha: ')
+        senha2 = input('Confirme sua senha: ')
+        
+        if senha == senha2:
+            if not cpf_repetido(cpf):
+                # Lê todas as linhas existentes no arquivo para contar quantas contas já existem
+                arquivo.seek(0)
+                numero_conta = sum(1 for _ in arquivo) + 1  # Gera o número da conta sequencialmente
+                numero_conta_formatado = f'{numero_conta:04d}'  # Formata o número da conta com quatro dígitos, preenchendo com zeros à esquerda se necessário
+                dados_usuario = {"Nome": nome, "CPF": cpf, "Senha": senha, "Saldo": 0.0, "NumeroAgencia": "0001", "NumeroConta": numero_conta_formatado}
+                arquivo.write(str(dados_usuario) + '\n')
+                print('Conta criada com sucesso!')
+            else:
+                print('CPF já cadastrado')
+        else:
+            print('Senhas não coincidem!')
+
+
+menu = '''
+
+
+    Bem vindo ao banco!
+
+     [a] Acessar conta
+     [c] Criar conta
+     [s] Sair
+
+
+'''
+
+while True:
+
+    print(menu)
+    opcao = input('Digite a opção desejada: ')
+    
+    if opcao == "a":
+        acessar_conta()
+
+    elif opcao == "c":
+        criar_conta()
+
+    elif opcao == "s":
+        print('Sessão finalizada!')
+        break
 
